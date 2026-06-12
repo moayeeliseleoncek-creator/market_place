@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="espace_vendeur.css">
+    <title>Espace Vendeur</title>
+    <style>
+        /* COMPTEUR */
+        #compteur_abonnement {
+            display: none;
+            background: linear-gradient(to right, #1a1a1a, #8b2d00);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #compteur_abonnement .label { font-size: 13px; opacity: 0.8; margin-bottom: 6px; }
+        #compteur_abonnement .temps { font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+        #compteur_abonnement.expire { background: linear-gradient(to right, #cc0000, #8b0000); }
+        #compteur_abonnement .barre-fond {
+            background: rgba(255,255,255,0.2); border-radius: 10px;
+            height: 6px; margin-top: 10px; overflow: hidden;
+        }
+        #compteur_abonnement .barre-remplie {
+            background: #ff5e00; height: 100%; border-radius: 10px; transition: width 1s;
+        }
+
+        /* ÉTAPES INSCRIPTION */
+        .etapes {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 30px;
+        }
+        .etape {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #bbb;
+        }
+        .etape .num {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: #ddd;
+            color: #999;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold;
+        }
+        .etape.actif .num { background: #8b2d00; color: white; }
+        .etape.actif { color: #8b2d00; }
+        .etape.fait .num { background: #007a2f; color: white; }
+        .etape.fait { color: #007a2f; }
+        .separateur-etape {
+            width: 40px; height: 2px;
+            background: #ddd; margin: 0 4px; align-self: center;
+        }
+        .separateur-etape.fait { background: #007a2f; }
+
+        /* BLOC ÉTAPE */
+        .bloc-etape { display: none; }
+        .bloc-etape.actif { display: block; }
+    </style>
+</head>
+
+<body>
+
+    <header class="header-image"></header>
+
+    <nav>
+        <ul class="menu">
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="espace_client.html">Espace Client</a></li>
+          <li><a href="espace_vendeur.html">Espace Vendeur</a></li>
+          <li><a href="admin.html">Espace Admin</a></li>
+        </ul>
+    </nav>
+
+    <main>
+
+        <section class="presentation-vendeur">
+            <h2>Développez votre activité avec ESETEC Marketplace</h2>
+            <p>
+                L'espace vendeur permet aux étudiants et entrepreneurs de publier
+                facilement leurs produits sur la plateforme.
+                <br><br>
+                Après votre inscription, votre paiement et la validation de votre compte,
+                vous bénéficiez de <strong>30 jours d'abonnement</strong> pour publier vos articles.
+            </p>
+        </section>
+
+        <!-- COMPTEUR ABONNEMENT -->
+        <section id="section_compteur" style="width:90%; max-width:1000px; margin:20px auto; display:none;">
+            <div id="compteur_abonnement">
+                <div class="label">⏱️ Temps restant sur votre abonnement</div>
+                <div class="temps" id="temps_restant">--</div>
+                <div class="barre-fond">
+                    <div class="barre-remplie" id="barre_progression" style="width:100%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- CONNEXION                       -->
+        <!-- ═══════════════════════════════ -->
+        <section id="connexion">
+            <h2>Se connecter</h2>
+
+            <p id="message_erreur" style="display:none;
+                background:#ffe0e0; color:#cc0000; padding:12px 16px;
+                border-radius:8px; margin-bottom:15px; font-weight:bold;
+                border-left:4px solid #cc0000;">
+                ❌ Email ou mot de passe incorrect.
+            </p>
+            <p id="msg_attente" style="display:none;
+                background:#fff8e1; color:#8b6000; padding:14px 16px;
+                border-radius:8px; margin-bottom:15px; font-weight:bold;
+                border-left:4px solid #f9a825;">
+                ⏳ Votre compte est en attente de validation par l'administrateur.
+            </p>
+            <p id="msg_refuse" style="display:none;
+                background:#ffe0e0; color:#cc0000; padding:14px 16px;
+                border-radius:8px; margin-bottom:15px; font-weight:bold;
+                border-left:4px solid #cc0000;">
+                ❌ Votre demande a été refusée. Contactez l'administrateur.
+            </p>
+            <p id="msg_expire" style="display:none;
+                background:#ffe0e0; color:#cc0000; padding:14px 16px;
+                border-radius:8px; margin-bottom:15px; font-weight:bold;
+                border-left:4px solid #cc0000;">
+                ⌛ Votre abonnement a expiré. Contactez l'administrateur pour renouveler.
+            </p>
+            <p id="message_bienvenue" style="display:none;
+                background:#e0ffe8; color:#007a2f; padding:12px 16px;
+                border-radius:8px; margin-bottom:15px; font-weight:bold;
+                border-left:4px solid #007a2f;">
+            </p>
+
+            <form id="form_connexion">
+                <label>Email</label>
+                <input type="email" id="input_email" placeholder="votre@email.com">
+                <label>Mot de passe</label>
+                <input type="password" id="input_mdp" placeholder="••••••••">
+                <button type="button" id="btn_connexion" onclick="connecter()">Se connecter</button>
+            </form>
+
+            <p id="lien_inscription" style="text-align:center; margin-top:15px; font-size:14px; color:#666;">
+                Pas encore de compte ?
+                <a href="#inscription" style="color:#8b2d00; font-weight:bold;">S'inscrire ici</a>
+            </p>
+
+            <button id="btn_deconnexion" type="button" onclick="deconnecter()" style="
+                display:none; margin-top:15px; background:#555; color:white;
+                border:none; padding:12px 20px; border-radius:8px;
+                font-size:15px; cursor:pointer; width:100%;">
+                🔓 Se déconnecter
+            </button>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- INSCRIPTION EN 3 ÉTAPES                        -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <section id="inscription">
+            <h2>S'inscrire</h2>
+
+            <!-- Indicateur d'étapes -->
+            <div class="etapes">
+                <div class="etape actif" id="ind_etape1">
+                    <div class="num">1</div>
+                    <span>Informations</span>
+                </div>
+                <div class="separateur-etape" id="sep1"></div>
+                <div class="etape" id="ind_etape2">
+                    <div class="num">2</div>
+                    <span>Paiement</span>
+                </div>
+                <div class="separateur-etape" id="sep2"></div>
+                <div class="etape" id="ind_etape3">
+                    <div class="num">3</div>
+                    <span>Confirmation</span>
+                </div>
+            </div>
+
+            <!-- ── ÉTAPE 1 : Informations ── -->
+            <div class="bloc-etape actif" id="etape1">
+                <p id="msg_inscription_err" style="display:none;
+                    background:#ffe0e0; color:#cc0000; padding:12px 16px;
+                    border-radius:8px; margin-bottom:15px; font-weight:bold;
+                    border-left:4px solid #cc0000;"></p>
+
+                <form id="form_inscription">
+                    <label>Nom complet *</label>
+                    <input type="text" id="reg_nom" placeholder="Ex: Konan Armand">
+
+                    <label>Email *</label>
+                    <input type="email" id="reg_email" placeholder="votre@email.com">
+
+                    <label>Numéro WhatsApp *</label>
+                    <input type="tel" id="reg_whatsapp" placeholder="+225 07 XX XX XX XX">
+
+                    <label>Mot de passe *</label>
+                    <input type="password" id="reg_mdp" placeholder="Minimum 6 caractères">
+
+                    <label>Confirmer le mot de passe *</label>
+                    <input type="password" id="reg_mdp2" placeholder="Répétez le mot de passe">
+
+                    <button type="button" id="btn_etape1" onclick="validerEtape1()">
+                        Suivant → Paiement
+                    </button>
+                </form>
+            </div>
+
+            <!-- ── ÉTAPE 2 : Paiement ── -->
+            <div class="bloc-etape" id="etape2">
+                <p style="background:#fff8e1; color:#8b6000; padding:14px 16px;
+                    border-radius:8px; margin-bottom:20px; border-left:4px solid #f9a825;
+                    font-size:14px; line-height:1.6;">
+                    📋 <strong>Durée :</strong> 30 jours — <strong>Montant :</strong> 2 500 FCFA<br>
+                    Effectuez le paiement puis passez à l'étape suivante.
+                </p>
+
+                <h3 style="margin-bottom:12px;">Payer via Wave</h3>
+                <a href="https://pay.wave.com/m/M_ci_mUsAktmv33Ro/c/ci/" target="_blank">
+                    <button type="button" style="
+                        background:#1a73e8; color:white; border:none;
+                        padding:14px 25px; border-radius:8px; font-size:15px;
+                        font-weight:bold; cursor:pointer; width:100%; margin-bottom:20px;">
+                        💳 Payer 2 500 FCFA avec Wave
+                    </button>
+                </a>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="allerEtape(1)" style="
+                        flex:1; background:#eee; color:#444; border:none;
+                        padding:12px; border-radius:8px; font-size:14px; cursor:pointer;">
+                        ← Retour
+                    </button>
+                    <button type="button" onclick="allerEtape(3)" style="
+                        flex:2; background:#8b2d00; color:white; border:none;
+                        padding:12px; border-radius:8px; font-size:15px;
+                        font-weight:bold; cursor:pointer;">
+                        J'ai payé → Envoyer la preuve
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── ÉTAPE 3 : Preuve WhatsApp ── -->
+            <div class="bloc-etape" id="etape3">
+                <p style="background:#e0ffe8; color:#007a2f; padding:14px 16px;
+                    border-radius:8px; margin-bottom:20px; border-left:4px solid #007a2f;
+                    font-size:14px; line-height:1.6;">
+                    ✅ Parfait ! Envoyez maintenant votre capture de paiement à l'administrateur via WhatsApp.
+                </p>
+
+                <form id="form_preuve">
+                    <label>Capture d'écran du paiement Wave *</label>
+                    <input type="file" id="capture_paiement" accept="image/*">
+                </form>
+
+                <div id="msg_preuve_err" style="display:none;
+                    background:#ffe0e0; color:#cc0000; padding:12px 16px;
+                    border-radius:8px; margin-bottom:15px; font-weight:bold;
+                    border-left:4px solid #cc0000;">
+                    ❌ Veuillez sélectionner votre capture d'écran.
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button type="button" onclick="allerEtape(2)" style="
+                        flex:1; background:#eee; color:#444; border:none;
+                        padding:12px; border-radius:8px; font-size:14px; cursor:pointer;">
+                        ← Retour
+                    </button>
+                    <button type="button" onclick="envoyerPreuve()" style="
+                        flex:2; background:#25D366; color:white; border:none;
+                        padding:12px; border-radius:8px; font-size:15px;
+                        font-weight:bold; cursor:pointer;">
+                        📲 Envoyer sur WhatsApp
+                    </button>
+                </div>
+
+                <div id="msg_inscription_ok" style="display:none;
+                    background:#e0ffe8; color:#007a2f; padding:14px 16px;
+                    border-radius:8px; margin-top:20px; font-weight:bold;
+                    border-left:4px solid #007a2f; text-align:center; line-height:1.8;">
+                    ✅ Inscription complète !<br>
+                    L'administrateur va vérifier votre paiement.<br>
+                    Vous recevrez l'accès sous 24h maximum.
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════ -->
+        <!-- AJOUTER UN ARTICLE              -->
+        <!-- ═══════════════════════════════ -->
+        <section id="ajouter_article" style="display:none;">
+            <h2>Ajouter un article</h2>
+            <p id="msg_article_ok" style="display:none;
+                background:#e0ffe8; color:#007a2f; padding:12px 16px;
+                border-radius:8px; margin-bottom:15px; font-weight:bold;
+                border-left:4px solid #007a2f;">
+                ✅ Article publié avec succès ! Visible dans l'espace client.
+            </p>
+            <p id="msg_article_err" style="display:none;
+                background:#ffe0e0; color:#cc0000; padding:12px 16px;
+                border-radius:8px; margin-bottom:15px; font-weight:bold;
+                border-left:4px solid #cc0000;">
+                ❌ Erreur lors de la publication. Vérifiez votre connexion.
+            </p>
+
+            <form id="form_article">
+                <label>Photo de l'article</label>
+                <input type="file" id="photo_article" accept="image/*">
+                <label>Nom de l'article *</label>
+                <input type="text" id="nom_article" placeholder="Ex: iPhone 13 Pro">
+                <label>Description *</label>
+                <textarea id="desc_article" placeholder="Décrivez votre article..."></textarea>
+                <label>Prix (FCFA) *</label>
+                <input type="number" id="prix_article" placeholder="Ex: 150000">
+                <label>Numéro WhatsApp *</label>
+                <input type="tel" id="whatsapp_article" placeholder="+225 07 XX XX XX XX">
+                <label>Catégorie</label>
+                <select id="categorie_article">
+                    <option value="Autre">Autre</option>
+                    <option value="Vêtements">Vêtements</option>
+                    <option value="Accessoires">Accessoires</option>
+                    <option value="Informatique">Informatique</option>
+                    <option value="Fournitures">Fournitures scolaires</option>
+                    <option value="Alimentation">Alimentation</option>
+                    <option value="Électronique">Électronique</option>
+                </select>
+                <button type="button" id="btn_publier" onclick="publierArticle()">
+                    📦 Publier l'article
+                </button>
+            </form>
+        </section>
+
+    </main>
+
+    <footer><p>© 2025 ESETEC Marketplace</p></footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, push, set, get, query, orderByChild, equalTo }
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0AD4E1t_YuQLHOgsEOy_wQKZ4l9ycrMo",
+            authDomain: "esetec-marketplace.firebaseapp.com",
+            projectId: "esetec-marketplace",
+            storageBucket: "esetec-marketplace.firebasestorage.app",
+            messagingSenderId: "480104714016",
+            appId: "1:480104714016:web:c8b923f80c103701385145",
+            databaseURL: "https://esetec-marketplace-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db  = getDatabase(app);
+
+        const DUREE_ABONNEMENT = 30 * 24 * 60 * 60 * 1000;
+        var vendeurConnecte  = null;
+        var intervalCompteur = null;
+        var donneesInscription = {}; // stocke temporairement les infos étape 1
+
+        // ══════════════════════════════════════
+        // NAVIGATION ÉTAPES INSCRIPTION
+        // ══════════════════════════════════════
+        window.allerEtape = function(num) {
+            [1, 2, 3].forEach(function(n) {
+                document.getElementById("etape" + n).classList.toggle("actif", n === num);
+                var ind = document.getElementById("ind_etape" + n);
+                ind.classList.remove("actif", "fait");
+                if (n < num)  ind.classList.add("fait");
+                if (n === num) ind.classList.add("actif");
+            });
+            // Séparateurs
+            document.getElementById("sep1").classList.toggle("fait", num > 1);
+            document.getElementById("sep2").classList.toggle("fait", num > 2);
+        };
+
+        // ══════════════════════════════════════
+        // ÉTAPE 1 — Validation des infos
+        // ══════════════════════════════════════
+        window.validerEtape1 = async function() {
+            var nom      = document.getElementById("reg_nom").value.trim();
+            var email    = document.getElementById("reg_email").value.trim().toLowerCase();
+            var whatsapp = document.getElementById("reg_whatsapp").value.trim();
+            var mdp      = document.getElementById("reg_mdp").value;
+            var mdp2     = document.getElementById("reg_mdp2").value;
+            var errEl    = document.getElementById("msg_inscription_err");
+            errEl.style.display = "none";
+
+            if (!nom || !email || !whatsapp || !mdp || !mdp2) {
+                errEl.textContent = "❌ Veuillez remplir tous les champs.";
+                errEl.style.display = "block"; return;
+            }
+            if (mdp.length < 6) {
+                errEl.textContent = "❌ Le mot de passe doit contenir au moins 6 caractères.";
+                errEl.style.display = "block"; return;
+            }
+            if (mdp !== mdp2) {
+                errEl.textContent = "❌ Les mots de passe ne correspondent pas.";
+                errEl.style.display = "block"; return;
+            }
+
+            var btn = document.getElementById("btn_etape1");
+            btn.textContent = "⏳ Vérification..."; btn.disabled = true;
+
+            try {
+                var snap = await get(query(ref(db, "vendeurs"), orderByChild("email"), equalTo(email)));
+                if (snap.exists()) {
+                    errEl.textContent = "❌ Cet email est déjà utilisé.";
+                    errEl.style.display = "block";
+                    btn.textContent = "Suivant → Paiement"; btn.disabled = false; return;
+                }
+                // Sauvegarder les données pour l'étape 3
+                donneesInscription = { nom, email, whatsapp, mdp };
+                allerEtape(2);
+            } catch(err) {
+                errEl.textContent = "❌ Erreur technique. Réessayez.";
+                errEl.style.display = "block"; console.error(err);
+            }
+            btn.textContent = "Suivant → Paiement"; btn.disabled = false;
+        };
+
+        // ══════════════════════════════════════
+        // ÉTAPE 3 — Envoyer preuve + inscrire
+        // ══════════════════════════════════════
+        window.envoyerPreuve = function() {
+            var fichier = document.getElementById("capture_paiement").files[0];
+            var errEl   = document.getElementById("msg_preuve_err");
+            errEl.style.display = "none";
+
+            if (!fichier) {
+                errEl.style.display = "block"; return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = async function(e) {
+                // Ouvrir WhatsApp avec le message
+                var message =
+                    "Bonjour, je viens de m'inscrire sur Esetec Marketplace et j'ai effectué mon paiement Wave.\n\n" +
+                    "Nom complet : " + donneesInscription.nom + "\n" +
+                    "Email : " + donneesInscription.email + "\n" +
+                    "WhatsApp : " + donneesInscription.whatsapp + "\n\n" +
+                    "⚠️ La capture d'écran du paiement sera envoyée juste après ce message.";
+
+                var lien = "https://api.whatsapp.com/send?phone=2250768221911&text=" + encodeURIComponent(message);
+                window.open(lien, "_blank");
+
+                // Enregistrer le vendeur dans Firebase
+                try {
+                    await set(push(ref(db, "vendeurs")), {
+                        nom:            donneesInscription.nom,
+                        email:          donneesInscription.email,
+                        whatsapp:       donneesInscription.whatsapp,
+                        mdp:            donneesInscription.mdp,
+                        statut:         "en_attente",
+                        date:           new Date().toISOString(),
+                        dateActivation: null,
+                        dateExpiration: null
+                    });
+                    document.getElementById("msg_inscription_ok").style.display = "block";
+                    document.getElementById("capture_paiement").value = "";
+                    donneesInscription = {};
+                    allerEtape(1);
+                    setTimeout(function() {
+                        document.getElementById("msg_inscription_ok").style.display = "none";
+                        document.getElementById("form_inscription").reset();
+                    }, 5000);
+                } catch(err) {
+                    console.error(err);
+                    alert("Erreur lors de l'enregistrement. Mais votre message WhatsApp a été envoyé. Contactez l'admin.");
+                }
+            };
+            reader.readAsDataURL(fichier);
+        };
+
+        // ══════════════════════════════════════
+        // CONNEXION
+        // ══════════════════════════════════════
+        window.connecter = async function() {
+            var email = document.getElementById("input_email").value.trim().toLowerCase();
+            var mdp   = document.getElementById("input_mdp").value;
+
+            ["message_erreur","msg_attente","msg_refuse","msg_expire","message_bienvenue"].forEach(function(id) {
+                document.getElementById(id).style.display = "none";
+            });
+
+            if (!email || !mdp) {
+                document.getElementById("message_erreur").style.display = "block"; return;
+            }
+
+            var btn = document.getElementById("btn_connexion");
+            btn.textContent = "⏳ Connexion..."; btn.disabled = true;
+
+            try {
+                var snap = await get(query(ref(db, "vendeurs"), orderByChild("email"), equalTo(email)));
+                if (!snap.exists()) {
+                    document.getElementById("message_erreur").style.display = "block";
+                    btn.textContent = "Se connecter"; btn.disabled = false; return;
+                }
+
+                var vendeurData = null;
+                snap.forEach(function(e) { vendeurData = e.val(); });
+
+                if (vendeurData.mdp !== mdp) {
+                    document.getElementById("message_erreur").style.display = "block";
+                    btn.textContent = "Se connecter"; btn.disabled = false; return;
+                }
+                if (vendeurData.statut === "en_attente") {
+                    document.getElementById("msg_attente").style.display = "block";
+                    btn.textContent = "Se connecter"; btn.disabled = false; return;
+                }
+                if (vendeurData.statut === "refuse") {
+                    document.getElementById("msg_refuse").style.display = "block";
+                    btn.textContent = "Se connecter"; btn.disabled = false; return;
+                }
+                if (vendeurData.statut === "actif") {
+                    if (vendeurData.dateExpiration && Date.now() > vendeurData.dateExpiration) {
+                        document.getElementById("msg_expire").style.display = "block";
+                        btn.textContent = "Se connecter"; btn.disabled = false; return;
+                    }
+
+                    // ✅ Connexion réussie
+                    vendeurConnecte = vendeurData;
+
+                    // Cacher connexion et inscription
+                    document.getElementById("form_connexion").style.display  = "none";
+                    document.getElementById("lien_inscription").style.display = "none";
+                    document.getElementById("inscription").style.display      = "none";
+
+                    // Afficher bienvenue + déconnexion
+                    document.getElementById("message_bienvenue").style.display = "block";
+                    document.getElementById("message_bienvenue").textContent   = "✅ Bienvenue " + vendeurData.nom + " !";
+                    document.getElementById("btn_deconnexion").style.display   = "block";
+
+                    // Afficher sections vendeur
+                    document.getElementById("ajouter_article").style.display = "block";
+
+                    // Pré-remplir WhatsApp
+                    document.getElementById("whatsapp_article").value = vendeurData.whatsapp || "";
+
+                    // Démarrer compteur
+                    demarrerCompteur(vendeurData.dateExpiration);
+                }
+            } catch(err) {
+                document.getElementById("message_erreur").style.display = "block"; console.error(err);
+            }
+            btn.textContent = "Se connecter"; btn.disabled = false;
+        };
+
+        // ══════════════════════════════════════
+        // COMPTEUR
+        // ══════════════════════════════════════
+        function demarrerCompteur(dateExpiration) {
+            document.getElementById("section_compteur").style.display    = "block";
+            document.getElementById("compteur_abonnement").style.display = "block";
+
+            function maj() {
+                var restant     = dateExpiration - Date.now();
+                var progression = Math.max(0, restant / DUREE_ABONNEMENT * 100);
+                document.getElementById("barre_progression").style.width = progression + "%";
+
+                if (restant <= 0) {
+                    document.getElementById("temps_restant").textContent = "⌛ Abonnement expiré";
+                    document.getElementById("compteur_abonnement").classList.add("expire");
+                    document.getElementById("ajouter_article").style.display = "none";
+                    clearInterval(intervalCompteur);
+                    return;
+                }
+                var j = Math.floor(restant / 86400000);
+                var h = Math.floor((restant % 86400000) / 3600000);
+                var m = Math.floor((restant % 3600000) / 60000);
+                var s = Math.floor((restant % 60000) / 1000);
+                document.getElementById("temps_restant").textContent = j+" j  "+h+" h  "+m+" min  "+s+" sec";
+            }
+            maj();
+            intervalCompteur = setInterval(maj, 1000);
+        }
+
+        // ══════════════════════════════════════
+        // DÉCONNEXION
+        // ══════════════════════════════════════
+        window.deconnecter = function() {
+            vendeurConnecte = null;
+            if (intervalCompteur) { clearInterval(intervalCompteur); intervalCompteur = null; }
+
+            document.getElementById("form_connexion").style.display        = "flex";
+            document.getElementById("lien_inscription").style.display      = "block";
+            document.getElementById("inscription").style.display           = "block";
+            document.getElementById("input_email").value                   = "";
+            document.getElementById("input_mdp").value                     = "";
+            document.getElementById("message_bienvenue").style.display     = "none";
+            document.getElementById("message_erreur").style.display        = "none";
+            document.getElementById("msg_attente").style.display           = "none";
+            document.getElementById("msg_refuse").style.display            = "none";
+            document.getElementById("msg_expire").style.display            = "none";
+            document.getElementById("btn_deconnexion").style.display       = "none";
+            document.getElementById("section_compteur").style.display      = "none";
+            document.getElementById("compteur_abonnement").style.display   = "none";
+            document.getElementById("compteur_abonnement").classList.remove("expire");
+            document.getElementById("ajouter_article").style.display       = "none";
+            allerEtape(1);
+        };
+
+        // ══════════════════════════════════════
+        // PUBLIER ARTICLE
+        // ══════════════════════════════════════
+        window.publierArticle = async function() {
+            if (!vendeurConnecte || (vendeurConnecte.dateExpiration && Date.now() > vendeurConnecte.dateExpiration)) {
+                document.getElementById("msg_article_err").textContent = "⌛ Votre abonnement a expiré.";
+                document.getElementById("msg_article_err").style.display = "block"; return;
+            }
+
+            var nom       = document.getElementById("nom_article").value.trim();
+            var desc      = document.getElementById("desc_article").value.trim();
+            var prix      = document.getElementById("prix_article").value.trim();
+            var whatsapp  = document.getElementById("whatsapp_article").value.trim();
+            var categorie = document.getElementById("categorie_article").value;
+            var photoFile = document.getElementById("photo_article").files[0];
+
+            if (!nom || !desc || !prix || !whatsapp) {
+                alert("Veuillez remplir tous les champs obligatoires (*)."); return;
+            }
+
+            var btn = document.getElementById("btn_publier");
+            btn.textContent = "⏳ Publication..."; btn.disabled = true;
+
+            try {
+                var photoURL = "";
+                if (photoFile) {
+                    photoURL = await new Promise(function(resolve) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) { resolve(e.target.result); };
+                        reader.readAsDataURL(photoFile);
+                    });
+                }
+                await set(push(ref(db, "articles")), {
+                    nom, description: desc, prix: parseInt(prix),
+                    whatsapp, categorie, photo: photoURL,
+                    vendeur:        vendeurConnecte.nom,
+                    vendeurEmail:   vendeurConnecte.email,
+                    dateExpiration: vendeurConnecte.dateExpiration,
+                    date:           new Date().toISOString()
+                });
+                document.getElementById("msg_article_ok").style.display  = "block";
+                document.getElementById("msg_article_err").style.display = "none";
+                document.getElementById("form_article").reset();
+                document.getElementById("whatsapp_article").value = vendeurConnecte.whatsapp || "";
+            } catch(err) {
+                document.getElementById("msg_article_err").textContent = "❌ Erreur lors de la publication.";
+                document.getElementById("msg_article_err").style.display = "block";
+                console.error(err);
+            }
+            btn.textContent = "📦 Publier l'article"; btn.disabled = false;
+        };
+
+    </script>
+
+</body>
+</html>

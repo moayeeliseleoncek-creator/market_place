@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="espace_client.css">
+    <title>Espace Client</title>
+    <style>
+        /* GRILLE ARTICLES */
+        .grille-articles {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .carte-article {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .carte-article:hover {
+            transform: translateY(-4px);
+        }
+
+        .carte-article img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .carte-article .no-photo {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .carte-info {
+            padding: 14px;
+        }
+
+        .carte-categorie {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ff5e00;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .carte-nom {
+            font-size: 15px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .carte-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .carte-prix {
+            font-size: 16px;
+            font-weight: bold;
+            color: #8b2d00;
+            margin-bottom: 10px;
+        }
+
+        .carte-btn {
+            display: block;
+            width: 100%;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .carte-btn:hover {
+            background: #1da851;
+        }
+
+        /* CHARGEMENT */
+        .chargement {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 16px;
+        }
+
+        /* AUCUN ARTICLE */
+        .aucun-article {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+
+        .aucun-article p {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* BADGE CATEGORIE SELECT */
+        #recherche select {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header-image">
+       
+    </header>
+     <nav>
+        <ul class="menu">
+          <li><a href="index.html">Accueil</a></li> 
+          <li><a href="espace_client.html">Espace Client</a></li> 
+          <li><a href="espace_vendeur.html">Espace Vendeur</a></li> 
+          <li><a href="admin.html">Espace Admin</a></li>
+        </ul>
+     </nav>
+
+    <main>
+
+        <section class="presentation-client">
+            <h2>Découvrez les articles disponibles sur ESETEC Marketplace</h2>
+            <p>
+                Explorez différents produits publiés par les vendeurs de la plateforme.
+                Recherchez facilement des vêtements, accessoires, matériels informatiques,
+                fournitures scolaires et bien plus encore.
+                <br><br>
+                L'espace client vous permet de trouver rapidement les articles
+                dont vous avez besoin dans un environnement simple, rapide et moderne.
+            </p>
+        </section>
+
+        <!-- RECHERCHE -->
+        <section id="recherche">
+            <h2>Rechercher un article</h2>
+            <form onsubmit="return false;">
+                <input
+                    type="text"
+                    id="input_recherche"
+                    placeholder="Rechercher un article..."
+                    oninput="filtrerArticles()"
+                >
+                <select id="select_categorie" onchange="filtrerArticles()">
+                    <option value="">Toutes catégories</option>
+                    <option value="Vêtements">Vêtements</option>
+                    <option value="Accessoires">Accessoires</option>
+                    <option value="Informatique">Informatique</option>
+                    <option value="Fournitures">Fournitures scolaires</option>
+                    <option value="Alimentation">Alimentation</option>
+                    <option value="Électronique">Électronique</option>
+                    <option value="Autre">Autre</option>
+                </select>
+                <button type="button" onclick="filtrerArticles()">Rechercher</button>
+            </form>
+        </section>
+
+        <!-- ARTICLES -->
+        <section id="articles">
+            <h2>Articles disponibles</h2>
+            <div id="compteur" style="color:#888; font-size:14px; margin-top:8px;"></div>
+            <div class="grille-articles" id="grille-articles">
+                <div class="chargement">⏳ Chargement des articles...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2025 ESETEC Marketplace</p>
+    </footer>
+
+    <!-- FIREBASE SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0AD4E1t_YuQLHOgsEOy_wQKZ4l9ycrMo",
+            authDomain: "esetec-marketplace.firebaseapp.com",
+            projectId: "esetec-marketplace",
+            storageBucket: "esetec-marketplace.firebasestorage.app",
+            messagingSenderId: "480104714016",
+            appId: "1:480104714016:web:c8b923f80c103701385145",
+            databaseURL: "https://esetec-marketplace-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db  = getDatabase(app);
+
+        // Stocke tous les articles pour la recherche
+        var tousLesArticles = [];
+
+        // Écoute les articles en temps réel
+        var articlesRef = ref(db, "articles");
+
+        onValue(articlesRef, function(snapshot) {
+            tousLesArticles = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(function(enfant) {
+                    var article = enfant.val();
+                    article.id = enfant.key;
+                    tousLesArticles.push(article);
+                });
+                // Trier du plus récent au plus ancien
+                tousLesArticles.reverse();
+            }
+
+            afficherArticles(tousLesArticles);
+        });
+
+        // Afficher les articles dans la grille
+        function afficherArticles(articles) {
+            var grille = document.getElementById("grille-articles");
+            var compteur = document.getElementById("compteur");
+
+            if (articles.length === 0) {
+                grille.innerHTML =
+                    "<div class='aucun-article' style='grid-column:1/-1;'>" +
+                    "<div style='font-size:48px;'>🛒</div>" +
+                    "<p>Aucun article disponible pour le moment.<br>" +
+                    "Revenez bientôt !</p></div>";
+                compteur.textContent = "";
+                return;
+            }
+
+            compteur.textContent = articles.length + " article(s) trouvé(s)";
+            grille.innerHTML = "";
+
+            articles.forEach(function(article) {
+                var carte = document.createElement("div");
+                carte.className = "carte-article";
+
+                var photoHTML = article.photo
+                    ? "<img src='" + article.photo + "' alt='" + article.nom + "'>"
+                    : "<div class='no-photo'>📦</div>";
+
+                var prixFormate = article.prix
+                    ? parseInt(article.prix).toLocaleString("fr-FR") + " FCFA"
+                    : "Prix non défini";
+
+                var msgWhatsApp =
+                    "Bonjour, je suis intéressé(e) par votre article *" + article.nom +
+                    "* affiché sur ESETEC Marketplace. Est-il encore disponible ?";
+
+                var lienWhatsApp = "https://api.whatsapp.com/send?phone=" +
+                    article.whatsapp.replace(/[^0-9]/g, "") +
+                    "&text=" + encodeURIComponent(msgWhatsApp);
+
+                carte.innerHTML =
+                    photoHTML +
+                    "<div class='carte-info'>" +
+                    "<div class='carte-categorie'>" + (article.categorie || "Autre") + "</div>" +
+                    "<div class='carte-nom'>" + article.nom + "</div>" +
+                    "<div class='carte-desc'>" + (article.description || "") + "</div>" +
+                    "<div class='carte-prix'>" + prixFormate + "</div>" +
+                    "<a href='" + lienWhatsApp + "' target='_blank' class='carte-btn'>" +
+                    "💬 Contacter le vendeur</a>" +
+                    "</div>";
+
+                grille.appendChild(carte);
+            });
+        }
+
+        // Filtrer par nom et catégorie
+        window.filtrerArticles = function() {
+            var recherche  = document.getElementById("input_recherche").value.toLowerCase();
+            var categorie  = document.getElementById("select_categorie").value;
+
+            var filtres = tousLesArticles.filter(function(a) {
+                var nomOk = a.nom.toLowerCase().includes(recherche) ||
+                            (a.description || "").toLowerCase().includes(recherche);
+                var catOk = !categorie || a.categorie === categorie;
+                return nomOk && catOk;
+            });
+
+            afficherArticles(filtres);
+        };
+
+    </script>
+
+</body>
+</html>

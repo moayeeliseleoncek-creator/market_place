@@ -1,0 +1,204 @@
+/* =========================
+   STYLE GENERAL
+========================= */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+    line-height: 1.6;
+}
+
+/* =========================
+   HEADER
+========================= */
+.header-image{
+    background-image: url("entete1.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 500px;
+    border-top: 4px solid #ff5e00;
+    border-bottom: 4px solid #ff5e00;
+}
+header{
+    background: linear-gradient(to right,#f6f4f3, #d14e12);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 4px solid #ff5e00;
+}
+
+header h1{
+    color: white;
+    font-size: 35px;
+    margin-bottom: 15px;
+}
+
+.menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    border-bottom: 4px solid #ff5e00;
+}
+
+.menu li a {
+    display: block;
+    padding: 16px 28px;
+    color: rgb(255, 200, 50);
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.menu li a:hover {
+    background-color: rgb(212, 160, 23);
+    color: #000;
+}
+/* =========================
+   PRESENTATION
+========================= */
+
+.presentation-client{
+    width: 90%;
+    max-width: 1000px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.presentation-client h2{
+    color: #8b2d00;
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+.presentation-client p{
+    font-size: 18px;
+    color: #444;
+    line-height: 1.8;
+}
+
+/* =========================
+   RECHERCHE
+========================= */
+
+#recherche{
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+#recherche h2{
+    color: #8b2d00;
+    margin-bottom: 20px;
+}
+
+#recherche form{
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+#recherche input,
+#recherche select{
+    flex: 1;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+#recherche button{
+    background: #ff5e00;
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#recherche button:hover{
+    background: #cc4b00;
+}
+
+/* =========================
+   ARTICLES
+========================= */
+
+#articles{
+    width: 90%;
+    max-width: 1000px;
+    margin: 40px auto;
+    background: white;
+    padding: 35px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+#articles h2{
+    color: #8b2d00;
+    text-align: center;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+    background: #000;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+    border-top: 4px solid #ff5e00;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    nav a{
+        display: block;
+        margin: 10px 0;
+    }
+
+    #recherche form{
+        flex-direction: column;
+    }
+
+    .presentation-client,
+    #recherche,
+    #articles{
+        width: 95%;
+        padding: 25px;
+    }
+
+    header h1{
+        font-size: 28px;
+    }
+
+    .presentation-client h2{
+        font-size: 26px;
+    }
+}
