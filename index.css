@@ -1,7 +1,35 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body{
+    overflow-x: hidden;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+}
+
+img{
+    max-width: 100%;
+    height: auto;
+}
+
 /* HEADER */
+header{
+    text-align: center;
+}
+
+h1{
+    border-top: 4px solid #ff5e00;
+    color: #ff5e00;
+    margin-top: 0 auto;
+
+}
 
 .header-image{
-    background-image: url("imade_arriere_plan1.png");
+    background-image: url("imade_arriere_plan1.webp");
     background-size: cover;
     background-position: center;
     height: 500px;
@@ -21,35 +49,261 @@
 
 
 
-/* HERO */
+/* =========================================================
+   HERO SLIDER
+========================================================= */
 
-.hero{
-    text-align: center;
-    padding: 60px 20px;
+.hero-slider{
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #111;
+    color: #fff;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
 }
 
-.hero h1{
-    font-size: 42px;
-    margin-bottom: 20px;
+/* Toutes les slides sont empilées au même endroit :
+   la hauteur s'adapte à la slide la plus haute (jamais de texte coupé) */
+.slides{
+    display: grid;
 }
 
-.hero span{
+.slide{
+    grid-area: 1 / 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: clamp(560px, 85vh, 820px);
+    padding: 90px 8% 120px;
+
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 1.2s ease,
+        visibility 0s linear 1.2s;
+}
+
+.slide.is-active{
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+    transition-delay: 0s;
+}
+
+/* Image de fond (remplit toute la section, sans déformation) */
+.slide::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: scale(1.06);
+    transition: transform 8s ease-out;
+}
+
+.slide.is-active::before{
+    transform: scale(1);
+}
+
+/* Seule l'image de la 1ère diapositive est chargée tout de suite (visible dès l'arrivée).
+   Les images des diapositives 2 et 3 sont ajoutées en JS (via --slide-bg) juste avant
+   leur affichage, pour que le visiteur ne télécharge pas les 3 images d'un coup. */
+.slide-1::before{ background-image: url("slide1.webp"); }
+.slide-2::before, .slide-3::before{ background-image: var(--slide-bg, none); }
+
+/* Voile noir semi-transparent, plus foncé côté texte (gauche) */
+.slide::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg,
+            rgba(0,0,0,0.78) 0%,
+            rgba(0,0,0,0.58) 50%,
+            rgba(0,0,0,0.35) 100%);
+}
+
+/* CONTENU */
+
+.slide-contenu{
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 640px;
+}
+
+.slide-titre{
+    font-size: clamp(2.1rem, 5.2vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 26px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+}
+
+.titre-accent{
+    display: block;
     color: #ff6600;
 }
 
-.description{
-    max-width: 850px;
-    margin: auto;
-    font-size: 18px;
-    line-height: 1.8;
-    color: #444;
+.slide-texte{
+    max-width: 34em;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    line-height: 1.75;
+    color: rgba(255,255,255,0.93);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.5);
 }
 
-/* BOUTONS */
-
-.hero-boutons{
-    margin-top: 30px;
+.slide-texte-secondaire{
+    color: rgba(255,255,255,0.85);
 }
+
+.slide-trait{
+    display: block;
+    width: 70px;
+    height: 4px;
+    margin: 26px 0;
+    background: #ff6600;
+    border-radius: 4px;
+}
+
+/* BOUTONS DU HERO (mêmes liens qu'avant) */
+
+.hero-slider .hero-boutons{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 0;
+}
+
+.hero-slider .btn-principal,
+.hero-slider .btn-secondaire{
+    margin: 0;
+    padding: 13px 28px;
+    border: 2px solid #ff6600;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.hero-slider .btn-principal:hover{
+    background: #fff;
+    border-color: #fff;
+    color: #111;
+}
+
+.hero-slider .btn-secondaire{
+    background: transparent;
+    border-color: rgba(255,255,255,0.85);
+}
+
+.hero-slider .btn-secondaire:hover{
+    background: #ff6600;
+    border-color: #ff6600;
+    color: #fff;
+}
+
+/* APPARITION PROGRESSIVE DU CONTENU */
+
+.slide-contenu > *{
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.slide.is-active .slide-contenu > *{
+    opacity: 1;
+    transform: none;
+    transition: opacity 1s ease, transform 1s ease;
+}
+
+.slide.is-active .slide-contenu > :nth-child(1){ transition-delay: 0.45s; }
+.slide.is-active .slide-contenu > :nth-child(2){ transition-delay: 0.7s; }
+.slide.is-active .slide-contenu > :nth-child(3){ transition-delay: 0.9s; }
+.slide.is-active .slide-contenu > :nth-child(4){ transition-delay: 1.05s; }
+.slide.is-active .slide-contenu > :nth-child(5){ transition-delay: 1.2s; }
+
+/* FLECHES */
+
+.hero-fleche{
+    position: absolute;
+    bottom: 24px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    color: #fff;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.45);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.hero-precedent{ left: 24px; }
+.hero-suivant{ right: 24px; }
+
+.hero-fleche:hover{
+    background: #ff6600;
+    border-color: #ff6600;
+}
+
+/* POINTS */
+
+.hero-dots{
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    z-index: 5;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.hero-dot{
+    position: relative;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.hero-dot::before{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.75);
+    border-radius: 12px;
+    transition: width 0.4s ease, background 0.4s ease;
+}
+
+.hero-dot:hover::before{
+    background: #fff;
+}
+
+.hero-dot.is-active::before{
+    width: 28px;
+    background: #ff6600;
+}
+
+/* Contour visible pour la navigation au clavier */
+.hero-fleche:focus-visible,
+.hero-dot:focus-visible,
+.hero-slider .btn-principal:focus-visible,
+.hero-slider .btn-secondaire:focus-visible{
+    outline: 3px solid #ffc832;
+    outline-offset: 3px;
+}
+
+/* BOUTONS (hors slider, inchangés) */
 
 .btn-principal,
 .btn-secondaire{
@@ -83,13 +337,119 @@
     color: white;
 }
 
+/* =========================================================
+   CATEGORIES POPULAIRES
+========================================================= */
+
+.categories-populaires{
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+    text-align: center;
+    
+}
+
+.categories-populaires h2{
+    color: #1a1a1a;
+    font-size: 30px;
+    margin-bottom: 8px;
+     border-top: 4px solid #ff5e00;
+    margin-top: 0 auto;
+    padding: 20px;
+    
+}
+
+
+.categories-grille{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.categorie-carte{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    aspect-ratio: 3 / 4;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.categorie-carte .icone{
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.categorie-carte .icone img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.categorie-carte::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to top,
+        rgba(0,0,0,0.85) 0%,
+        rgba(0,0,0,0.45) 40%,
+        rgba(0,0,0,0) 70%);
+}
+
+.categorie-carte h3{
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    padding: 18px 14px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.55);
+}
+
+.categorie-carte:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255,102,0,0.18);
+}
+
+.categorie-carte:hover .icone img{
+    transform: scale(1.07);
+}
+
+@media(max-width:768px){
+    .categories-grille{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+}
+
+@media(max-width:480px){
+    .categories-grille{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .categorie-carte h3{
+        font-size: 13px;
+        padding: 14px 10px;
+    }
+}
+
 /*  FOOTER*/
 
 footer{
     background: black;
     color: white;
-
-    text-align: center;
 
     padding: 20px;
     margin-top: 50px;
@@ -98,7 +458,107 @@ footer{
     
 }
 
+.footer-conteneu{
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px 20px;
+    text-align: left;
+}
+
+.footer-marque h3{
+    color: #ff6600;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.footer-marque h3 span{
+    color: #fff;
+}
+
+.footer-marque p{
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.footer-colonne h4{
+    color: #fff;
+    font-size: 15px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.footer-colonne ul{
+    list-style: none;
+}
+
+.footer-colonne li{
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+}
+
+.footer-colonne a{
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+.footer-colonne a:hover{
+    color: #ff6600;
+}
+
+.footer-bas{
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 20px 0;
+    text-align: center;
+}
+
+.footer-bas p{
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+}
+
+@media(max-width:768px){
+    .footer-conteneu{
+        grid-template-columns: 1fr 1fr;
+        text-align: center;
+    }
+
+    .footer-marque{
+        grid-column: 1 / -1;
+        text-align: center;
+    }
+}
+
+@media(max-width:480px){
+    .footer-conteneu{
+        grid-template-columns: 1fr;
+    }
+}
+
 /* RESPONSIVE */
+
+/* Tablettes */
+@media(max-width:900px){
+
+    .slide{
+        min-height: clamp(420px, 62vw, 640px);
+        padding: 70px 7% 110px;
+    }
+
+    .slide::after{
+        background:
+            linear-gradient(90deg,
+                rgba(0,0,0,0.80) 0%,
+                rgba(0,0,0,0.62) 60%,
+                rgba(0,0,0,0.5) 100%);
+    }
+}
 
 @media(max-width:768px){
 
@@ -116,8 +576,83 @@ footer{
     .recherche button{
         width: 100%;
     }
+}
 
-    .hero h1{
-        font-size: 30px;
+/* Téléphones */
+@media(max-width:600px){
+
+    .slide{
+        min-height: clamp(340px, 68vw, 480px);
+        padding: 50px 22px 110px;
+    }
+
+    /* voile uniforme pour un texte lisible sur toute la largeur */
+    .slide::after{
+        background: rgba(0,0,0,0.66);
+    }
+
+    .slide-titre{
+        margin-bottom: 18px;
+    }
+
+    .slide-texte{
+        line-height: 1.65;
+    }
+
+    .slide-trait{
+        width: 56px;
+        margin: 18px 0;
+    }
+
+    .hero-slider .hero-boutons{
+        gap: 10px;
+    }
+
+    .hero-slider .btn-principal,
+    .hero-slider .btn-secondaire{
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+
+    .hero-fleche{
+        width: 40px;
+        height: 40px;
+        bottom: 20px;
+    }
+
+    .hero-precedent{ left: 12px; }
+    .hero-suivant{ right: 12px; }
+
+    .hero-dots{
+        bottom: 24px;
+    }
+}
+
+/* Très petits téléphones */
+@media(max-width:360px){
+
+    .slide{
+        min-height: clamp(300px, 72vw, 420px);
+        padding: 40px 16px 105px;
+    }
+
+    .hero-slider .btn-principal,
+    .hero-slider .btn-secondaire{
+        padding: 11px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Si l'appareil demande moins d'animations : on garde le fondu,
+   mais on supprime le zoom et le glissement */
+@media (prefers-reduced-motion: reduce){
+
+    .slide::before{
+        transform: none;
+        transition: none;
+    }
+
+    .slide-contenu > *{
+        transform: none;
     }
 }

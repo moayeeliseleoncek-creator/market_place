@@ -10,6 +10,7 @@
 
 html{
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body{
@@ -18,6 +19,13 @@ body{
     color: #222;
     line-height: 1.6;
     min-height: 100vh;
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+img{
+    max-width: 100%;
+    height: auto;
 }
 
 
@@ -29,7 +37,7 @@ body{
     width: 100%;
     height: 500px;
 
-    background-image: url("entete2.jpg");
+    background-image: url("entete2.webp");
     background-size: cover;
     background-position: center;
 
@@ -498,13 +506,11 @@ footer{
 
     margin-top: 60px;
 
-    padding: 30px 20px;
+    padding: 30px 20px 0;
 
     background: #111111;
 
     color: #ffffff;
-
-    text-align: center;
 
     border-top: 5px solid #ff5e00;
 
@@ -512,26 +518,372 @@ footer{
         0 -4px 15px rgba(0,0,0,0.20);
 }
 
-footer p{
-    margin: 5px 0;
+.footer-conteneu{
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 20px 20px;
+    text-align: left;
+}
 
-    color: #dddddd;
+.footer-marque h3{
+    color: #ffc832;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
 
+.footer-marque h3 span{
+    color: #fff;
+}
+
+.footer-marque p{
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.footer-colonne h4{
+    color: #fff;
+    font-size: 15px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.footer-colonne ul{
+    list-style: none;
+}
+
+.footer-colonne li{
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+}
+
+.footer-colonne a{
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+.footer-colonne a:hover{
+    color: #ffc832;
+}
+
+.footer-bas{
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 20px;
+    text-align: center;
+}
+
+.footer-bas p{
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+}
+
+@media(max-width:768px){
+    .footer-conteneu{
+        grid-template-columns: 1fr 1fr;
+        text-align: center;
+    }
+
+    .footer-marque{
+        grid-column: 1 / -1;
+        text-align: center;
+    }
+}
+
+@media(max-width:480px){
+    .footer-conteneu{
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   AUTHENTIFICATION — CONNEXION / INSCRIPTION
+========================================================= */
+
+.auth-section{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1100px;
+    min-height: 620px;
+    margin: 50px auto;
+    border-radius: 26px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.22);
+}
+
+/* ---- Panneau visuel (gauche) ---- */
+
+.auth-visuel{
+    position: relative;
+    background-image: url("entete2.webp");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    padding: 60px 50px;
+    color: #fff;
+}
+
+.auth-visuel::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(139,45,0,0.92), rgba(10,10,10,0.86));
+}
+
+.auth-visuel-contenu{
+    position: relative;
+    z-index: 2;
+}
+
+.auth-logo-badge{
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    margin-bottom: 26px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    overflow: hidden;
+}
+
+.auth-logo-badge img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.auth-titre-marque{
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 14px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+.auth-titre-marque span{
+    color: #ffb347;
+}
+
+.auth-slogan{
+    font-size: 18px;
+    font-style: italic;
+    color: #ffd9b3;
+    margin-bottom: 16px;
+}
+
+.auth-desc{
+    font-size: 15px;
+    line-height: 1.75;
+    color: rgba(255,255,255,0.88);
+    max-width: 380px;
+    margin-bottom: 30px;
+}
+
+.auth-badges{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.auth-badge{
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* ---- Carte formulaire (droite) ---- */
+
+.auth-carte{
+    background: #fff;
+    padding: 56px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.auth-carte:hover{
+    transform: none;
+    box-shadow: none;
+}
+
+.auth-icone-badge{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #fff3e9;
+    color: #ff5e00;
+    font-size: 18px;
+}
+
+.auth-carte h2{
+    font-size: 27px;
+    color: #1a1a1a;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 25px;
+}
+
+.auth-souscription{
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: -15px;
+    margin-bottom: 24px;
+}
+
+.auth-separateur{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.auth-separateur::before,
+.auth-separateur::after{
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ececec;
+}
+
+.auth-separateur span{
+    color: #ff5e00;
     font-size: 14px;
 }
 
-footer a{
-    color: #ffc832;
-
-    text-decoration: none;
-
-    font-weight: 600;
-
-    transition: color 0.3s ease;
+.auth-carte form{
+    text-align: left;
 }
 
-footer a:hover{
+.auth-carte label{
+    margin-top: 12px;
+}
+
+.auth-carte input,
+.auth-carte textarea{
+    padding: 13px 14px;
+}
+
+.auth-carte #lien_inscription,
+.auth-lien-bas{
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+    margin-top: 18px;
+}
+
+.auth-lien-bas a,
+.auth-carte #lien_inscription a{
     color: #ff5e00;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-carte #lien_inscription a:hover,
+.auth-lien-bas a:hover{
+    text-decoration: underline;
+}
+
+/* Étapes d'inscription : rapprocher du style de la carte */
+.auth-carte .etapes{
+    margin-bottom: 26px;
+}
+
+/* ---- Responsive ---- */
+
+@media(max-width:900px){
+    .auth-section{
+        grid-template-columns: 1fr;
+        min-height: 0;
+        margin: 30px auto;
+        border-radius: 20px;
+    }
+
+    .auth-visuel{
+        padding: 40px 30px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .auth-visuel-contenu{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .auth-desc{
+        max-width: 100%;
+    }
+
+    .auth-badges{
+        justify-content: center;
+    }
+
+    .auth-carte{
+        padding: 40px 28px;
+    }
+}
+
+@media(max-width:480px){
+    .auth-section{
+        width: 94%;
+        margin: 24px auto;
+        border-radius: 16px;
+    }
+
+    .auth-visuel{
+        padding: 32px 20px;
+    }
+
+    .auth-logo-badge{
+        width: 68px;
+        height: 68px;
+        margin-bottom: 18px;
+    }
+
+    .auth-titre-marque{
+        font-size: 26px;
+    }
+
+    .auth-slogan{
+        font-size: 15px;
+    }
+
+    .auth-desc{
+        font-size: 14px;
+    }
+
+    .auth-carte{
+        padding: 32px 18px;
+    }
+
+    .auth-carte h2{
+        font-size: 22px;
+    }
 }
 
 
